@@ -6,8 +6,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 
 import javax.jws.WebService;
 
-//bp.getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-
 @EndpointProperties(value = {
         @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "server.properties"),
         @EndpointProperty(key = SecurityConstants.ENCRYPT_PROPERTIES, value = "server.properties"),
