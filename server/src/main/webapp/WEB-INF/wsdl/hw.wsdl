@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://wsssampl.company.org/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsp="http://www.w3.org/ns/ws-policy"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:wsaws="http://www.w3.org/2005/08/addressing"
+                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+                  xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="hw"
+                  targetNamespace="http://wsssampl.company.org/">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://wsssampl.company.org/"
+                   elementFormDefault="unqualified" targetNamespace="http://wsssampl.company.org/" version="1.0">
+
+            <xs:element name="getVersion" type="tns:getVersion"/>
+
+            <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+            <xs:complexType name="getVersion">
+                <xs:sequence/>
+            </xs:complexType>
+
+            <xs:complexType name="getVersionResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="return" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getVersion">
+        <wsdl:part element="tns:getVersion" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getVersionResponse">
+        <wsdl:part element="tns:getVersionResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="IHelloWorld">
+        <wsdl:documentation>Тестовый сервис</wsdl:documentation>
+        <wsdl:operation name="getVersion">
+            <wsdl:documentation>Получение версии сервиса</wsdl:documentation>
+            <wsdl:input message="tns:getVersion" name="getVersion">
+            </wsdl:input>
+            <wsdl:output message="tns:getVersionResponse" name="getVersionResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="hwSoapBinding" type="tns:IHelloWorld">
+        <wsp:PolicyReference URI="#SecurityServiceSignThenEncryptPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getVersion">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="getVersion">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getVersionResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="hw">
+        <wsdl:port binding="tns:hwSoapBinding" name="hwPort">
+            <soap:address location="http://localhost:8080/service/hw"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsp:Policy wsu:Id="SecurityServiceSignThenEncryptPolicy"
+                xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:InitiatorToken>
+                            <wsp:Policy>
+                                <sp:X509Token
+                                        sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V1Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp:Policy>
+                                <sp:X509Token
+                                        sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V1Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:RecipientToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:TripleDesRsa15/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:SignBeforeEncrypting/>
+                    </wsp:Policy>
+                </sp:AsymmetricBinding>
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
+                </sp:SignedParts>
+                <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
+                </sp:EncryptedParts>
+                <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial/>
+                    </wsp:Policy>
+                </sp:Wss10>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+</wsdl:definitions>
